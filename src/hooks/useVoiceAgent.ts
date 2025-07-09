@@ -19,6 +19,7 @@ export function useVoiceAgent() {
   const session = useRef<RealtimeSession | null>(null);
   const [connected, setConnected] = useState(false);
   const [history, setHistory] = useState<RealtimeItem[]>([]);
+  const [isAISpeaking, setIsAISpeaking] = useState(false);
 
   const connect = async () => {
     const token = await getSessionToken();
@@ -32,6 +33,23 @@ export function useVoiceAgent() {
     
     session.current.on("history_updated", (history) => {
       setHistory(history);
+    });
+    
+    // Track AI speaking state based on history updates
+    session.current.on("history_updated", (history) => {
+      setHistory(history);
+      
+      // Check if the last message is from assistant and is currently being spoken
+      const lastMessage = history[history.length - 1];
+      if (lastMessage && lastMessage.type === "message" && 'role' in lastMessage && lastMessage.role === "assistant") {
+        // Simple heuristic: if the message is recent and from assistant, AI is speaking
+        setIsAISpeaking(true);
+        
+        // Stop speaking after a delay (you can adjust this timing)
+        setTimeout(() => {
+          setIsAISpeaking(false);
+        }, 3000); // 3 seconds delay
+      }
     });
     
     session.current.on(
@@ -65,6 +83,7 @@ export function useVoiceAgent() {
   return {
     connected,
     history,
+    isAISpeaking,
     toggleConnection,
   };
 } 
