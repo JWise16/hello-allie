@@ -35,6 +35,11 @@ const nextConfig: NextConfig = {
     
     return config;
   },
+  // Add error handling for production builds
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
 };
 
 export default nextConfig;

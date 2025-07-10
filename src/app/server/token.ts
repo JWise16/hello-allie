@@ -3,13 +3,23 @@
 import OpenAI from "openai";
 
 export async function getSessionToken() {
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
+  // Check if API key is available
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY environment variable is not set");
+  }
 
-  const session = await openai.beta.realtime.sessions.create({
-    model: "gpt-4o-realtime-preview",
-  });
+  try {
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
 
-  return session.client_secret.value;
+    const session = await openai.beta.realtime.sessions.create({
+      model: "gpt-4o-realtime-preview",
+    });
+
+    return session.client_secret.value;
+  } catch (error) {
+    console.error("Error creating OpenAI session:", error);
+    throw new Error(`Failed to create OpenAI session: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }

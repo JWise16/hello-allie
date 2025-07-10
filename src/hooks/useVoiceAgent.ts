@@ -25,50 +25,56 @@ export function useVoiceAgent() {
   const [currentInstructions, setCurrentInstructions] = useState<string>(AGENT_CONFIG.instructions);
 
   const connect = async () => {
-    const token = await getSessionToken();
-    const agent = createAgent(currentVoice, currentInstructions);
-    session.current = new RealtimeSession(agent, {
-      model: AGENT_CONFIG.model,
-    });
-    
-    session.current.on("transport_event", (event) => {
-      console.log(event);
-    });
-    
-    session.current.on("history_updated", (history) => {
-      setHistory(history);
-    });
-    
-    // Track AI speaking state based on history updates
-    session.current.on("history_updated", (history) => {
-      setHistory(history);
+    try {
+      const token = await getSessionToken();
+      const agent = createAgent(currentVoice, currentInstructions);
+      session.current = new RealtimeSession(agent, {
+        model: AGENT_CONFIG.model,
+      });
       
-      // Check if the last message is from assistant and is currently being spoken
-      const lastMessage = history[history.length - 1];
-      if (lastMessage && lastMessage.type === "message" && 'role' in lastMessage && lastMessage.role === "assistant") {
-        // Simple heuristic: if the message is recent and from assistant, AI is speaking
-        setIsAISpeaking(true);
+      session.current.on("transport_event", (event) => {
+        console.log(event);
+      });
+      
+      session.current.on("history_updated", (history) => {
+        setHistory(history);
+      });
+      
+      // Track AI speaking state based on history updates
+      session.current.on("history_updated", (history) => {
+        setHistory(history);
         
-        // Stop speaking after a delay (you can adjust this timing)
-        setTimeout(() => {
-          setIsAISpeaking(false);
-        }, 3000); // 3 seconds delay
-      }
-    });
-    
-    session.current.on(
-      "tool_approval_requested",
-      async (context, agent, approvalRequest) => {
-        const response = prompt("Approve or deny the tool call?");
-        console.log(response);
-        session.current?.approve(approvalRequest.approvalItem);
-      }
-    );
-    
-    await session.current.connect({
-      apiKey: token,
-    });
-    setConnected(true);
+        // Check if the last message is from assistant and is currently being spoken
+        const lastMessage = history[history.length - 1];
+        if (lastMessage && lastMessage.type === "message" && 'role' in lastMessage && lastMessage.role === "assistant") {
+          // Simple heuristic: if the message is recent and from assistant, AI is speaking
+          setIsAISpeaking(true);
+          
+          // Stop speaking after a delay (you can adjust this timing)
+          setTimeout(() => {
+            setIsAISpeaking(false);
+          }, 3000); // 3 seconds delay
+        }
+      });
+      
+      session.current.on(
+        "tool_approval_requested",
+        async (context, agent, approvalRequest) => {
+          const response = prompt("Approve or deny the tool call?");
+          console.log(response);
+          session.current?.approve(approvalRequest.approvalItem);
+        }
+      );
+      
+      await session.current.connect({
+        apiKey: token,
+      });
+      setConnected(true);
+    } catch (error) {
+      console.error("Failed to connect to voice agent:", error);
+      // You might want to show an error message to the user here
+      throw error;
+    }
   };
 
   const disconnect = async () => {
