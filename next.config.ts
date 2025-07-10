@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["openai"],
+  // Add environment variables to the build
+  env: {
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  },
   webpack: (config, { isServer }) => {
     // Handle the missing module issue
     config.resolve.fallback = {
