@@ -17,7 +17,7 @@ export default function VoiceAgent() {
   } = useVoiceAgent();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-600 via-pink-500 to-red-600 p-8 relative">
+    <div className="min-h-screen bg-gradient-to-br from-red-600 via-pink-500 to-red-600 p-4 sm:p-8 relative">
       <VoiceMenu 
         currentVoice={currentVoice}
         onVoiceChange={changeVoice}
@@ -25,27 +25,28 @@ export default function VoiceAgent() {
         onInstructionsChange={changeInstructions}
       />
       
-      <div className="text-center mb-12">
+      <div className="text-center mb-8 sm:mb-12">
         <TypewriterText 
           text="Hello my name is Allie" 
           speed={80}
-          className="text-6xl font-serif italic text-white mb-6"
+          className="text-4xl sm:text-5xl md:text-6xl font-serif italic text-white mb-4 sm:mb-6"
         />
-        <p className="text-white/80 text-xl">click the mic & say hello</p>
+        <p className="text-white/80 text-lg sm:text-xl">click the mic & say hello</p>
       </div>
       
-      <div className="flex justify-center items-center min-h-[50vh] relative">
+      <div className="flex justify-center items-center min-h-[40vh] sm:min-h-[50vh] relative">
         <AudioWaves isActive={isAISpeaking} />
         <button
           onClick={toggleConnection}
-          className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer border-2 relative z-10 ${
+          className={`w-24 h-24 sm:w-32 sm:h-32 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer border-2 relative z-10 active:scale-95 ${
             connected 
               ? 'bg-white text-red-500 border-white' 
               : 'bg-white/20 backdrop-blur-sm text-white border-white/30 hover:bg-white/30'
           }`}
+          aria-label={connected ? "Disconnect microphone" : "Connect microphone"}
         >
           <svg 
-            className="w-16 h-16 transition-colors duration-300"
+            className="w-12 h-12 sm:w-16 sm:h-16 transition-colors duration-300"
             fill="currentColor" 
             viewBox="0 0 24 24"
           >
