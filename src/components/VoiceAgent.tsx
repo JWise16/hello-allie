@@ -3,12 +3,28 @@
 import { useVoiceAgent } from "../hooks/useVoiceAgent";
 import TypewriterText from "./TypewriterText";
 import AudioWaves from "./AudioWaves";
+import VoiceMenu from "./VoiceMenu";
 
 export default function VoiceAgent() {
-  const { connected, isAISpeaking, toggleConnection } = useVoiceAgent();
+  const { 
+    connected, 
+    isAISpeaking, 
+    currentVoice, 
+    currentInstructions,
+    toggleConnection, 
+    changeVoice,
+    changeInstructions 
+  } = useVoiceAgent();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-600 via-pink-500 to-red-600 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-red-600 via-pink-500 to-red-600 p-8 relative">
+      <VoiceMenu 
+        currentVoice={currentVoice}
+        onVoiceChange={changeVoice}
+        currentInstructions={currentInstructions}
+        onInstructionsChange={changeInstructions}
+      />
+      
       <div className="text-center mb-12">
         <TypewriterText 
           text="Hello my name is Allie" 

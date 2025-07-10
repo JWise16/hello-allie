@@ -8,11 +8,12 @@ import {
 } from "@openai/agents/realtime";
 import { getSessionToken } from "../app/server/token";
 import { AGENT_CONFIG } from "../lib/constants";
+import { VoiceOption } from "../components/VoiceMenu";
 
-const agent = new RealtimeAgent({
+const createAgent = (voice: VoiceOption, instructions: string) => new RealtimeAgent({
   name: AGENT_CONFIG.name,
-  instructions: AGENT_CONFIG.instructions,
-  voice: AGENT_CONFIG.voice,
+  instructions: instructions,
+  voice: voice,
 });
 
 export function useVoiceAgent() {
@@ -20,9 +21,12 @@ export function useVoiceAgent() {
   const [connected, setConnected] = useState(false);
   const [history, setHistory] = useState<RealtimeItem[]>([]);
   const [isAISpeaking, setIsAISpeaking] = useState(false);
+  const [currentVoice, setCurrentVoice] = useState<VoiceOption>("sage");
+  const [currentInstructions, setCurrentInstructions] = useState<string>(AGENT_CONFIG.instructions);
 
   const connect = async () => {
     const token = await getSessionToken();
+    const agent = createAgent(currentVoice, currentInstructions);
     session.current = new RealtimeSession(agent, {
       model: AGENT_CONFIG.model,
     });
@@ -80,10 +84,34 @@ export function useVoiceAgent() {
     }
   };
 
+  const changeVoice = async (newVoice: VoiceOption) => {
+    setCurrentVoice(newVoice);
+    
+    // If currently connected, reconnect with new voice
+    if (connected) {
+      await disconnect();
+      await connect();
+    }
+  };
+
+  const changeInstructions = async (newInstructions: string) => {
+    setCurrentInstructions(newInstructions);
+    
+    // If currently connected, reconnect with new instructions
+    if (connected) {
+      await disconnect();
+      await connect();
+    }
+  };
+
   return {
     connected,
     history,
     isAISpeaking,
+    currentVoice,
+    currentInstructions,
     toggleConnection,
+    changeVoice,
+    changeInstructions,
   };
 } 
