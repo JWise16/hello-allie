@@ -25,7 +25,7 @@ export default function VoiceAgent() {
         onInstructionsChange={changeInstructions}
       />
       
-      <div className="text-center mb-8 sm:mb-12">
+      <div className="text-center mb-8 sm:mb-12 pt-20 sm:pt-8">
         <TypewriterText 
           text="Hello my name is Allie" 
           speed={80}
